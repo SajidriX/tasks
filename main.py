@@ -1,46 +1,28 @@
-from fastapi import FastAPI, Query, Body, Path, Header, Cookie, File, UploadFile, Depends, BackgroundTasks
-from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
-from fastapi.middleware.cors import CORSMiddleware
-from contextlib import asynccontextmanager
-from schemas import Tasks
-from db import init_db, Base,engine
-from Tasks.main_tasks import router as task_router
-import uvicorn
+import redis
 
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    # 1. Создаем таблицы при старте
-    print("🟢 Создаем таблицы в БД...")
-    Base.metadata.create_all(bind=engine)
-    
-    # 2. Здесь работает приложение
-    yield
-    
-    # 3. Закрываем соединения при завершении
-    print("🔴 Закрываем соединение с БД...")
-    engine.dispose()
-
-app = FastAPI(lifespan = lifespan)
-
-origins = [
-    "http://127.0.0.1:8000",  # Основной домен API
-    "http://localhost:8000",   # Альтернативный адрес
-    "http://localhost:3000",   # Для фронтенда (React/Vue)
-    "http://127.0.0.1:3000",   # Альтернативный адрес фронтенда
-]
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+client=redis.Redis(
+    host='localhost',
+    port=6379,
+    db=0
 )
 
+try:
+    response = client.ping()
+    print(f"TCP connection is ready,{response}")
+except redis.ConnectionError as e:
+    print(f"E:{e}")
 
-app.include_router(task_router)
+client.set('name','Aboba')
+name = client.get('name')
+print(name.decode())
+client.delete('name')
 
+if client.exists('name'):
+    print("key name is  in db")
+else:
+    print("Db has no key name")
 
-if __name__ == "__main__":
-    uvicorn.run("main:app", reload=True, port = 8000)
+client.set('users_online',238)
+client.incr('users_online')
+users_online = client.get('users_online')
+print(users_online.decode())
