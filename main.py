@@ -6,6 +6,7 @@ from schemas import Tasks
 from db import init_db, Base,engine
 from Tasks.main_tasks import router as task_router
 import uvicorn
+from users.main_users import router as user_router
 
 
 @asynccontextmanager
@@ -45,6 +46,7 @@ async def main_page():
 
 
 app.include_router(task_router)
+app.include_router(user_router)
 
 
 if __name__ == "__main__":
