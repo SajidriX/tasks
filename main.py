@@ -25,8 +25,8 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan = lifespan)
 
 origins = [
-    "http://127.0.0.1:8000",  # Основной домен API
-    "http://localhost:8000",   # Альтернативный адрес
+    "http://127.0.0.1:1488",  # Основной домен API
+    "http://localhost:1488",   # Альтернативный адрес
     "http://localhost:3000",   # Для фронтенда (React/Vue)
     "http://127.0.0.1:3000",   # Альтернативный адрес фронтенда
 ]
